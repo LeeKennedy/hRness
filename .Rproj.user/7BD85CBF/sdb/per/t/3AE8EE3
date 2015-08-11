@@ -1,0 +1,16 @@
+{
+    "contents" : "library(readr)\nlibrary(dplyr)\n\ndata <- read_csv(\"1609_1800M.csv\")\ncolnames(data)[2] <- \"Venue\"\ndata <- data[,c(1:17)]\n\n#Convert to odds and rearrange ----------------------------------------\ndata2 <- select(data, everything())%>%\n        transmute(Date, \n                  Venue, \n                  Race, \n                  B1 = 1/(B1+1),\n                  B2 = 1/(B2+1),\n                  B3 = 1/(B3+1),\n                  B4 = 1/(B4+1),\n                  B5 = 1/(B5+1),\n                  B6 = 1/(B6+1),\n                  B7 = 1/(B7+1),\n                  B8 = 1/(B8+1),\n                  B9 = 1/(B9+1),\n                  B10 = 1/(B10+1),\n                  B11 = 1/(B11+1),\n                  B12 = 1/(B12+1),\n                  B13 = 1/(B13+1),\n                  Win)\ndata3 <- data2[, c(1:3, 17, 4:16)]\ndata3a <- data3[,c(1:4)]\n\n# peel off the positions only ----------------------------------------\ndata4 <- data3[,c(5:17)]\n# Set position factors -----------------------------------------------\nFactors <- rep(10,13)\nn <- nrow(data4)\ndepth <- 4\npcnt_win_1 <- 0\n\n\nfor (h in 1:13) {\n        for (g in 7:13) {\n        Factors[h] = g\n        \n# Multiply position by factor ----------------------------------------\ndata5 <-data.frame(mapply(`*`,data4,Factors))\n\ndata6 <- data.frame(\n        B1=numeric(),\n        B2=numeric(),\n        B3=numeric(),\n        B4=numeric(),\n        B5=numeric(),\n        B6=numeric(),\n        B7=numeric(),\n        B8=numeric(),\n        B9=numeric(),\n        B10=numeric(),\n        B11=numeric(),\n        B12=numeric(),\n        B13=numeric())\n\n\nfor (i in 1:n){\ndata6[i,] <- (rank(-data5[i,]))\n}\n\ndata7 <- cbind(data3a, data6)\n\ndata7$flag = 0\n\n\nfor (j in 1:n) {\nm <- data7$Win[j]+4\nif (data7[j,m] <= depth) {data7$flag[j]=1}\n}\n\npcnt_win <- round(sum(data7$flag)*100/n,2)\n\nif (pcnt_win > pcnt_win_1) {\n        pcnt_win_1 = pcnt_win\n        factor_1 = Factors[h]\n}\nFactors[h] <- factor_1\n}\n}",
+    "created" : 1429614478679.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "855855555",
+    "id" : "3AE8EE3",
+    "lastKnownWriteTime" : 1428839610,
+    "path" : "~/Documents/GitHub/hRness/scripts/1609.R",
+    "project_path" : "scripts/1609.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
